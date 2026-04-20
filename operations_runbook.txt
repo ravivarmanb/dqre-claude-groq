@@ -1,0 +1,104 @@
+CLAIMS PROCESSING OPERATIONAL RUNBOOK
+UK Health Insurance Operations Team
+Version 2.1 | Last Updated: 2024-03-15
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CHAPTER 5: DATA VALIDATION CHECKPOINTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+5.1 Pre-Processing Validation Gates
+
+Before any claim enters processing workflow:
+
+GATE 1 - Member Verification
+□ Member exists and status = ACTIVE
+□ Policy is ACTIVE and covers treatment date
+□ NHS number on claim matches member record
+□ Member age at treatment date is between 0 and 120
+
+GATE 2 - Financial Pre-Check
+□ Claimed amount > £0 and < £500,000 (outlier cap)
+□ Policy has not exceeded annual benefit limit
+□ Excess has been correctly applied to eligible claims
+
+GATE 3 - Provider Check
+□ Provider exists in approved network
+□ Provider type matches treatment_type category:
+  - GP visits → provider_type = 'GP'
+  - Surgeries → provider_type = 'HOSPITAL'
+  - Consultations → provider_type = 'SPECIALIST' or 'CLINIC'
+  - Prescriptions → provider_type = 'PHARMACY'
+□ Provider contract is active on treatment date
+
+5.2 Waitlist Data Quality
+
+Waitlist Integrity Rules:
+- referral_date must not be in the future
+- target_date should be referral_date + standard wait time (varies by treatment)
+- If actual_date is populated, status must be COMPLETED
+- If status = COMPLETED, actual_date must be populated
+- Waitlist records with status WAITING and actual_date populated = data error
+- Members with more than 3 concurrent WAITING entries need review
+
+5.3 Premium Reconciliation Rules
+
+Monthly Premium Checks:
+- Count of PAID premiums per policy must match months since start_date (for active)
+- No policy should have 2 premium records with the same due_date
+- DD payment method: paid_date should be within 3 days of due_date
+- BACS payment: paid_date should be within 5 days of due_date
+- CHEQUE payment: paid_date should be within 10 days of due_date
+
+5.4 Cross-Table Consistency Checks
+
+The following cross-table checks must pass in all environments:
+- claims.member_id must equal policies.member_id for the linked policy
+- Policy end_date must be after all claim treatment_dates for that policy
+- Member registration_date must be on or before policy start_date
+- Member registration_date must be on or before all claims for that member
+- Providers used in approved claims must have active=1 at time of treatment
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CHAPTER 7: QUALITY THRESHOLDS BY SEVERITY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CRITICAL rules (threshold = 100%):
+- Negative financial amounts anywhere in system
+- Future dates of birth
+- Claims on non-existent or non-NHS providers
+- Duplicate NHS numbers
+- claim_date before treatment_date
+
+HIGH severity rules (threshold = 98%):
+- Missing NHS numbers on active members
+- Policy excess missing on Comprehensive/Elite
+- Rejected claims without rejection_reason
+- Claims without diagnosis codes
+
+MEDIUM severity rules (threshold = 95%):
+- Missing email on active members
+- Missing phone on active members
+- Policies without insurer_code
+
+LOW severity rules (threshold = 90%):
+- Waitlist target_date missing
+- Provider postcode missing
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CHAPTER 9: AUTOMATED MONITORING SCHEDULE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Daily (06:00 UTC):
+  - All CRITICAL and HIGH severity rules
+  - Claims pending > 30 days check
+  - Overdue premium detection
+
+Weekly (Monday 07:00 UTC):
+  - All MEDIUM severity rules
+  - Provider network validation
+  - Duplicate detection sweep
+
+Monthly (1st of month):
+  - All LOW severity rules
+  - Full referential integrity scan
+  - Waitlist overdue check

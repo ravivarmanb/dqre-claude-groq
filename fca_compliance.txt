@@ -1,0 +1,76 @@
+FCA CONSUMER DUTY & DATA INTEGRITY REQUIREMENTS
+UK Private Health Insurance Sector
+Reference: FCA PS22/9 | ICO Data Accuracy Principle
+
+═══════════════════════════════════════════════════════════════
+SECTION A — DATA ACCURACY (ICO Principle 4)
+═══════════════════════════════════════════════════════════════
+
+A1. Personal Data Accuracy
+Personal data must be accurate and where necessary kept up to date.
+- Date of birth mismatches between policy and claims data = CRITICAL violation
+- NHS numbers must be verified: 10-digit check digit validation required
+- Member names must not contain numeric characters
+- Postcodes must be valid UK postcodes (validated against PAF)
+
+A2. Financial Data Accuracy
+- All monetary values stored to exactly 2 decimal places
+- Approved claim amounts must never exceed original claimed amount
+- Premium amounts must align with policy product pricing bands:
+  BASIC: £20-£60/month, STANDARD: £45-£100/month,
+  COMPREHENSIVE: £75-£200/month, ELITE: £150-£500/month
+
+A3. Timeliness of Updates
+- Lapsed policies must have end_date populated within 5 business days
+- Rejected claims must have rejection_reason populated (not NULL)
+- Processed claims must have processed_date within 10 working days of claim_date
+
+═══════════════════════════════════════════════════════════════
+SECTION B — CONSUMER DUTY (FCA PS22/9)
+═══════════════════════════════════════════════════════════════
+
+B1. Fair Value Assessment Data
+- Products must not be mis-sold: BASIC policy members must not have claims
+  exceeding £5,000 in a single policy year without upgrade flagging.
+- Members aged 65+ on BASIC policies must be reviewed quarterly.
+
+B2. Vulnerable Customer Flags
+- Members with 3+ PENDING claims must be flagged for case management.
+- Members on waitlists exceeding 180 days past target_date require outreach.
+
+B3. Continuity of Cover
+- Members with ACTIVE policies must not have gaps > 30 days in premium history.
+- Premium payment failures (OVERDUE > 60 days) must trigger policy review.
+
+═══════════════════════════════════════════════════════════════
+SECTION C — ANTI-FRAUD CONTROLS
+═══════════════════════════════════════════════════════════════
+
+C1. Duplicate Claim Detection
+- Multiple claims for identical treatment_type on same member within 30 days
+  must be flagged for investigation.
+- Claimed amounts identical to the nearest £100 across multiple claims = flag.
+
+C2. Provider Fraud Indicators
+- Claims from providers with nhs_registered = 0 must never be approved.
+- Providers with > 80% of their claims REJECTED require suspension review.
+
+C3. Temporal Anomalies
+- Treatment dates that fall on UK public holidays require supporting evidence.
+- Claim submission within 24 hours of policy inception = fraud flag.
+
+═══════════════════════════════════════════════════════════════
+SECTION D — GDPR / UK DATA PROTECTION ACT 2018
+═══════════════════════════════════════════════════════════════
+
+D1. Data Minimisation
+- Diagnosis codes should only be stored when directly relevant to claim.
+- Member email/phone must not be duplicated across member records.
+
+D2. Retention
+- Cancelled member records must have a scheduled deletion review at 7 years.
+- Claim records for rejected claims must be retained for minimum 3 years.
+
+D3. Right to Erasure Compliance
+- Members with status CANCELLED and no open claims or active policies
+  are candidates for anonymisation after 7 years.

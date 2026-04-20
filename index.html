@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DQ Engine · UK Health Insurance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ════ TOKENS ═══════════════════════════════════════════════════════════ */
+:root {
+  --bg:        #05080f;
+  --s1:        #0b1018;
+  --s2:        #101620;
+  --s3:        #161e2c;
+  --border:    #1c2a3f;
+  --border2:   #243448;
+  --teal:      #00e5b4;
+  --teal-dim:  rgba(0,229,180,.12);
+  --blue:      #3b82f6;
+  --blue-dim:  rgba(59,130,246,.12);
+  --purple:    #a855f7;
+  --orange:    #f97316;
+  --rose:      #f43f5e;
+  --amber:     #f59e0b;
+  --green:     #22c55e;
+  --red:       #ef4444;
+  --text:      #e2e8f0;
+  --text2:     #94a3b8;
+  --text3:     #4b6070;
+  --mono:      'IBM Plex Mono', monospace;
+  --sans:      'Outfit', sans-serif;
+  --r:         10px;
+  --r2:        14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);overflow-x:hidden}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* ════ LAYOUT ═══════════════════════════════════════════════════════════ */
+.shell{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+.sidebar{background:var(--s1);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.main{overflow-y:auto;max-height:100vh}
+
+/* ════ SIDEBAR ══════════════════════════════════════════════════════════ */
+.logo{padding:22px 20px 20px;border-bottom:1px solid var(--border)}
+.logo-eyebrow{font-size:9px;letter-spacing:3px;color:var(--teal);text-transform:uppercase;margin-bottom:5px;font-family:var(--mono)}
+.logo-title{font-size:16px;font-weight:800;line-height:1.25}
+.logo-title em{color:var(--teal);font-style:normal}
+.nav{padding:14px 10px;flex:1}
+.nav-section{font-size:9px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;padding:10px 10px 5px;font-family:var(--mono)}
+.ni{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text2);transition:all .15s;border:none;background:none;width:100%;text-align:left;margin-bottom:2px}
+.ni:hover{background:var(--s3);color:var(--text)}
+.ni.active{background:var(--teal-dim);color:var(--teal)}
+.ni .ico{width:18px;text-align:center;font-size:14px;flex-shrink:0}
+.ni .badge-count{margin-left:auto;background:var(--amber);color:#000;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;font-family:var(--mono)}
+.sidebar-foot{padding:14px 18px;border-top:1px solid var(--border);font-size:10px;color:var(--text3);font-family:var(--mono)}
+.dot-pulse{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse 2s infinite;margin-right:6px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ════ PAGE CHROME ══════════════════════════════════════════════════════ */
+.page{display:none;padding:0}
+.page.active{display:block}
+.ph{padding:24px 32px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--s1);position:sticky;top:0;z-index:10}
+.ph-left .eyebrow{font-size:9px;letter-spacing:2.5px;color:var(--text3);text-transform:uppercase;margin-bottom:4px;font-family:var(--mono)}
+.ph-title{font-size:20px;font-weight:800}
+.ph-title em{color:var(--teal);font-style:normal}
+.ph-actions{display:flex;gap:8px;align-items:center}
+.content{padding:24px 32px}
+
+/* ════ BUTTONS ══════════════════════════════════════════════════════════ */
+.btn{padding:8px 16px;border-radius:8px;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:6px;transition:all .15s;white-space:nowrap}
+.btn-primary{background:var(--teal);color:#05080f}
+.btn-primary:hover{filter:brightness(1.1)}
+.btn-secondary{background:var(--s3);color:var(--text);border:1px solid var(--border2)}
+.btn-secondary:hover{border-color:var(--teal);color:var(--teal)}
+.btn-danger{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.25)}
+.btn-danger:hover{background:rgba(239,68,68,.22)}
+.btn-success{background:rgba(34,197,94,.12);color:var(--green);border:1px solid rgba(34,197,94,.25)}
+.btn-success:hover{background:rgba(34,197,94,.22)}
+.btn-ghost{background:none;color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover{color:var(--text);border-color:var(--border2)}
+.btn-sm{padding:5px 10px;font-size:11px;border-radius:6px}
+.btn-xs{padding:3px 8px;font-size:10px;border-radius:5px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ════ STATS ════════════════════════════════════════════════════════════ */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.stat-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);padding:18px 20px;position:relative;overflow:hidden}
+.stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.stat-card.teal::after{background:var(--teal)}
+.stat-card.blue::after{background:var(--blue)}
+.stat-card.amber::after{background:var(--amber)}
+.stat-card.rose::after{background:var(--rose)}
+.stat-card.green::after{background:var(--green)}
+.stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;font-family:var(--mono)}
+.stat-val{font-family:var(--mono);font-size:30px;font-weight:600;line-height:1}
+.stat-val.teal{color:var(--teal)}
+.stat-val.blue{color:var(--blue)}
+.stat-val.amber{color:var(--amber)}
+.stat-val.rose{color:var(--rose)}
+.stat-val.green{color:var(--green)}
+.stat-sub{font-size:11px;color:var(--text3);margin-top:5px}
+
+/* ════ CARDS ════════════════════════════════════════════════════════════ */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);margin-bottom:18px}
+.card-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:13px;font-weight:700;display:flex;align-items:center;gap:7px}
+.card-body{padding:18px 20px}
+
+/* ════ TABLE ════════════════════════════════════════════════════════════ */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;padding:9px 12px;font-size:9.5px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);border-bottom:1px solid var(--border);font-family:var(--mono);white-space:nowrap}
+td{padding:11px 12px;border-bottom:1px solid rgba(28,42,63,.5);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.015)}
+.cb{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+
+/* ════ BADGES ═══════════════════════════════════════════════════════════ */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:9.5px;font-weight:700;font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+/* status */
+.b-active,.b-pass{background:rgba(34,197,94,.12);color:var(--green);border:1px solid rgba(34,197,94,.25)}
+.b-pending,.b-pending_approval{background:rgba(245,158,11,.12);color:var(--amber);border:1px solid rgba(245,158,11,.25)}
+.b-fail,.b-rejected,.b-deactivated{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.25)}
+.b-error{background:rgba(239,68,68,.18);color:#ff8080;border:1px solid rgba(239,68,68,.4)}
+.b-warning{background:rgba(245,158,11,.12);color:var(--amber)}
+/* types */
+.b-completeness{background:rgba(59,130,246,.12);color:var(--blue);border:1px solid rgba(59,130,246,.25)}
+.b-validity{background:rgba(0,229,180,.1);color:var(--teal);border:1px solid rgba(0,229,180,.25)}
+.b-uniqueness{background:rgba(168,85,247,.12);color:var(--purple);border:1px solid rgba(168,85,247,.25)}
+.b-consistency{background:rgba(249,115,22,.12);color:var(--orange);border:1px solid rgba(249,115,22,.25)}
+.b-timeliness{background:rgba(244,63,94,.12);color:var(--rose);border:1px solid rgba(244,63,94,.25)}
+.b-accuracy{background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.25)}
+/* severity */
+.b-critical{background:rgba(239,68,68,.18);color:#ff8080}
+.b-high{background:rgba(249,115,22,.14);color:var(--orange)}
+.b-medium{background:rgba(245,158,11,.1);color:var(--amber)}
+.b-low{background:rgba(75,96,112,.15);color:var(--text3)}
+/* risk */
+.b-low-risk{background:rgba(34,197,94,.1);color:var(--green)}
+.b-medium-risk{background:rgba(245,158,11,.1);color:var(--amber)}
+.b-high-risk{background:rgba(249,115,22,.14);color:var(--orange)}
+.b-critical-risk{background:rgba(239,68,68,.18);color:#ff8080}
+
+/* ════ PROGRESS ═════════════════════════════════════════════════════════ */
+.prog{display:flex;align-items:center;gap:8px}
+.prog-bar{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;min-width:60px}
+.prog-fill{height:100%;border-radius:3px;transition:width .4s}
+.prog-val{font-family:var(--mono);font-size:10px;color:var(--text2);min-width:36px;text-align:right}
+
+/* ════ FORMS ════════════════════════════════════════════════════════════ */
+.fg{margin-bottom:16px}
+.fl{display:block;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
+.fc{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-family:var(--sans);font-size:13px;transition:border-color .15s;outline:none}
+.fc:focus{border-color:var(--teal)}
+textarea.fc{resize:vertical;min-height:90px;font-family:var(--mono);font-size:12px}
+select.fc{cursor:pointer}
+.rg{display:flex;gap:8px}
+.ro input{display:none}
+.ro label{display:block;padding:8px 14px;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;text-align:center;transition:all .15s;color:var(--text2)}
+.ro input:checked+label{border-color:var(--teal);color:var(--teal);background:var(--teal-dim)}
+.ro{flex:1}
+
+/* ════ LOG BOX ══════════════════════════════════════════════════════════ */
+.log{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-family:var(--mono);font-size:11.5px;max-height:200px;overflow-y:auto;line-height:1.9}
+.log-ok{color:var(--green)}
+.log-warn{color:var(--amber)}
+.log-err{color:var(--red)}
+.log-info{color:var(--text2)}
+
+/* ════ RESULT CARDS ═════════════════════════════════════════════════════ */
+.rg2{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.rc{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:15px;position:relative;transition:border-color .2s;border-left-width:3px}
+.rc:hover{border-color:var(--teal)}
+.rc.pass{border-left-color:var(--green)}
+.rc.fail{border-left-color:var(--red)}
+.rc.error{border-left-color:#ff8080}
+.rc-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:9px;gap:8px}
+.rc-name{font-size:12.5px;font-weight:700;line-height:1.3;flex:1}
+.rc-meta{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+.rc-nums{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:9px;padding-top:9px;border-top:1px solid var(--border)}
+.rc-num-val{font-family:var(--mono);font-size:17px;font-weight:600;line-height:1}
+.rc-num-lbl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.detail-txt{font-size:11px;color:var(--text3);margin-top:7px;font-family:var(--mono);word-break:break-all}
+.sql-reveal summary{font-size:10px;color:var(--text3);cursor:pointer;margin-top:8px}
+.sql-reveal summary:hover{color:var(--teal)}
+.sql-box{background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:8px 10px;font-family:var(--mono);font-size:10px;color:#7dd3fc;white-space:pre-wrap;word-break:break-all;max-height:90px;overflow-y:auto;margin-top:5px}
+
+/* ════ IMPACT PANEL ═════════════════════════════════════════════════════ */
+.impact-panel{background:var(--s2);border:1px solid var(--border2);border-radius:var(--r2);padding:20px;margin-bottom:22px}
+.impact-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.impact-score{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:700;flex-shrink:0}
+.impact-score.LOW{background:rgba(34,197,94,.15);border:2px solid var(--green);color:var(--green)}
+.impact-score.MEDIUM{background:rgba(245,158,11,.15);border:2px solid var(--amber);color:var(--amber)}
+.impact-score.HIGH{background:rgba(249,115,22,.15);border:2px solid var(--orange);color:var(--orange)}
+.impact-score.CRITICAL{background:rgba(239,68,68,.2);border:2px solid var(--red);color:var(--red)}
+.impact-score.UNKNOWN{background:rgba(148,163,184,.1);border:2px solid var(--text3);color:var(--text3)}
+.impact-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:14px}
+.impact-section h4{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-bottom:8px;font-family:var(--mono)}
+.impact-item{background:var(--s3);border:1px solid var(--border);border-radius:7px;padding:10px 12px;margin-bottom:6px;font-size:12px}
+.impact-item .prio{font-size:9px;font-family:var(--mono);font-weight:700;margin-bottom:3px}
+.prio-IMMEDIATE{color:var(--red)}
+.prio-SHORT_TERM{color:var(--amber)}
+.prio-LONG_TERM{color:var(--teal)}
+
+/* ════ MODALS ═══════════════════════════════════════════════════════════ */
+.overlay{display:none;position:fixed;inset:0;background:rgba(5,8,15,.88);z-index:100;align-items:center;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:var(--s1);border:1px solid var(--border2);border-radius:14px;padding:26px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto}
+.modal h3{font-size:15px;font-weight:800;margin-bottom:18px}
+.mf{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+
+/* ════ SELECTION BAR ════════════════════════════════════════════════════ */
+.sel-bar{position:sticky;bottom:0;background:var(--s2);border-top:1px solid var(--border);padding:12px 32px;display:none;align-items:center;gap:12px}
+.sel-bar.show{display:flex}
+.sel-bar-text{font-size:13px;font-weight:600;flex:1}
+
+/* ════ TABS ═════════════════════════════════════════════════════════════ */
+.tabs{display:flex;gap:2px;background:var(--s2);padding:4px;border-radius:10px;border:1px solid var(--border);margin-bottom:18px;width:fit-content}
+.tab{padding:7px 16px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text2);border:none;background:none;transition:all .15s}
+.tab.active{background:var(--teal);color:#05080f}
+.tab:hover:not(.active){color:var(--text)}
+
+/* ════ TOAST ════════════════════════════════════════════════════════════ */
+.toast{position:fixed;top:20px;right:20px;background:var(--s2);border:1px solid var(--border2);border-radius:10px;padding:12px 16px;font-size:13px;z-index:200;transform:translateX(120%);opacity:0;transition:all .3s;max-width:300px;display:flex;align-items:center;gap:8px}
+.toast.show{transform:translateX(0);opacity:1}
+.toast.success{border-color:var(--green)}
+.toast.warn{border-color:var(--amber)}
+.toast.err{border-color:var(--red)}
+
+/* ════ CHARTS ═══════════════════════════════════════════════════════════ */
+.mini-bar{display:flex;align-items:flex-end;gap:3px;height:50px}
+.mini-bar-col{flex:1;background:var(--teal);border-radius:3px 3px 0 0;min-height:4px;transition:height .4s}
+.chart-2col{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+
+/* ════ DRILLDOWN PANEL ══════════════════════════════════════════════════ */
+.drill-grid{display:grid;gap:6px;margin-top:10px}
+.drill-row{background:var(--s3);border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-family:var(--mono);font-size:11px;color:var(--text2);word-break:break-all}
+
+/* ════ TREND LINE (SVG) ═════════════════════════════════════════════════ */
+#trend-svg{width:100%;height:80px}
+
+/* ════ RESPONSIVE ═══════════════════════════════════════════════════════ */
+@media(max-width:860px){
+  .shell{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .impact-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ══════════ SIDEBAR ══════════ -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-eyebrow">DQ Engine v2</div>
+    <div class="logo-title">UK Health<br><em>Insurance</em></div>
+  </div>
+  <nav class="nav">
+    <div class="nav-section">Monitor</div>
+    <button class="ni active" id="ni-dashboard" onclick="nav('dashboard')"><span class="ico">◈</span>Dashboard</button>
+    <button class="ni" id="ni-execute" onclick="nav('execute')"><span class="ico">▷</span>Execute Rules</button>
+    <button class="ni" id="ni-runs" onclick="nav('runs')"><span class="ico">◉</span>Run History</button>
+    <div class="nav-section" style="margin-top:8px">Rules</div>
+    <button class="ni" id="ni-generate" onclick="nav('generate')"><span class="ico">⟳</span>Generate</button>
+    <button class="ni" id="ni-rules" onclick="nav('rules')"><span class="ico">⊞</span>Manage Rules<span class="badge-count" id="pending-count" style="display:none">0</span></button>
+    <button class="ni" id="ni-feedback" onclick="nav('feedback')"><span class="ico">💬</span>Feedback Log</button>
+  </nav>
+  <div class="sidebar-foot"><span class="dot-pulse"></span>LangGraph · Chroma · Gemini 2.0</div>
+</aside>
+
+<!-- ══════════ MAIN ══════════ -->
+<main class="main">
+
+<!-- ─── DASHBOARD ─────────────────────────────────────────────────────── -->
+<div id="page-dashboard" class="page active">
+  <div class="ph">
+    <div class="ph-left"><div class="eyebrow">Overview</div><div class="ph-title">Data Quality <em>Dashboard</em></div></div>
+    <div class="ph-actions">
+      <button class="btn btn-ghost btn-sm" onclick="refreshDashboard()">↺ Refresh</button>
+      <button class="btn btn-primary btn-sm" onclick="nav('execute')">▷ Run Rules</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="stat-grid">
+      <div class="stat-card teal"><div class="stat-label">Pass Rate (Last Run)</div><div class="stat-val teal" id="s-pass">—</div><div class="stat-sub" id="s-pass-sub">—</div></div>
+      <div class="stat-card green"><div class="stat-label">Active Rules</div><div class="stat-val green" id="s-active">—</div><div class="stat-sub">Enforced now</div></div>
+      <div class="stat-card amber"><div class="stat-label">Pending Approval</div><div class="stat-val amber" id="s-pending">—</div><div class="stat-sub">Awaiting review</div></div>
+      <div class="stat-card blue"><div class="stat-label">Total Executions</div><div class="stat-val blue" id="s-execs">—</div><div class="stat-sub">All time</div></div>
+    </div>
+
+    <div class="chart-2col">
+      <div class="card">
+        <div class="card-head"><div class="card-title">📊 Rules by Type</div></div>
+        <div class="card-body" id="type-donut" style="min-height:140px"></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">📈 Pass Rate Trend</div></div>
+        <div class="card-body">
+          <svg id="trend-svg" viewBox="0 0 400 80" preserveAspectRatio="none"></svg>
+          <div id="trend-labels" style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:4px"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-2col">
+      <div class="card">
+        <div class="card-head"><div class="card-title">🚨 Worst Performing Rules</div></div>
+        <div class="card-body" id="worst-rules"><div style="color:var(--text3);font-size:12px">Run rules to see data</div></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">🗄️ Rules by Table</div></div>
+        <div class="card-body" id="table-chart"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── GENERATE ──────────────────────────────────────────────────────── -->
+<div id="page-generate" class="page">
+  <div class="ph">
+    <div class="ph-left"><div class="eyebrow">AI-Powered</div><div class="ph-title">Generate <em>DQ Rules</em></div></div>
+  </div>
+  <div class="content" style="max-width:740px">
+    <div class="card">
+      <div class="card-head"><div class="card-title">🧠 LangGraph Pipeline: feedback → extract → generate → validate SQL → dedup → sync</div></div>
+      <div class="card-body">
+        <div class="fg">
+          <label class="fl">Knowledge Source Type</label>
+          <div class="rg">
+            <div class="ro"><input type="radio" name="stype" id="stype-text" value="text" checked><label for="stype-text">📝 Text / Rules</label></div>
+            <div class="ro"><input type="radio" name="stype" id="stype-folder" value="folder"><label for="stype-folder">📁 Folder (PDF/HTML/TXT)</label></div>
+          </div>
+        </div>
+        <div class="fg" id="fg-text">
+          <label class="fl">Knowledge Text</label>
+          <textarea class="fc" id="src-text" placeholder="Paste DQ policies, FCA guidelines, operational rules...
+
+Example:
+- NHS numbers must be 10 digits
+- Claims must be within 90 days of treatment
+- Premium amounts must be positive
+- Providers must be NHS-registered"></textarea>
+        </div>
+        <div class="fg" id="fg-folder" style="display:none">
+          <label class="fl">Folder Path (absolute)</label>
+          <input class="fc" type="text" id="src-folder" placeholder="/home/user/dq_engine/knowledge_docs">
+          <div style="font-size:11px;color:var(--text3);margin-top:4px">📁 Sample docs available at: <code style="color:var(--teal)">./knowledge_docs/</code></div>
+        </div>
+        <button class="btn btn-primary" id="btn-gen" onclick="doGenerate()">🤖 Run LangGraph Pipeline</button>
+      </div>
+    </div>
+
+    <div class="card" id="gen-card" style="display:none">
+      <div class="card-head">
+        <div class="card-title">Pipeline Log</div>
+        <div id="gen-pipeline-steps" style="display:flex;gap:6px;font-size:10px;font-family:var(--mono)"></div>
+      </div>
+      <div class="card-body">
+        <div class="log" id="gen-log"></div>
+        <div id="gen-result" style="margin-top:12px;padding:12px 16px;background:var(--teal-dim);border:1px solid rgba(0,229,180,.2);border-radius:8px;font-size:13px;display:none"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── RULES ─────────────────────────────────────────────────────────── -->
+<div id="page-rules" class="page">
+  <div class="ph">
+    <div class="ph-left"><div class="eyebrow">Configuration</div><div class="ph-title">Manage <em>DQ Rules</em></div></div>
+    <div class="ph-actions">
+      <select class="fc" id="rules-filter" onchange="loadRules()" style="width:160px;padding:7px 10px;font-size:12px">
+        <option value="">All statuses</option>
+        <option value="PENDING_APPROVAL">Pending Approval</option>
+        <option value="ACTIVE">Active</option>
+        <option value="REJECTED">Rejected</option>
+        <option value="DEACTIVATED">Deactivated</option>
+      </select>
+      <button class="btn btn-ghost btn-sm" onclick="loadRules()">↺</button>
+    </div>
+  </div>
+  <div class="content" style="padding-bottom:60px">
+    <div class="card">
+      <div class="card-body" style="padding:0">
+        <div class="tw">
+          <table id="rules-tbl">
+            <thead><tr>
+              <th><input type="checkbox" id="chk-all" onchange="toggleAll(this)"></th>
+              <th>ID</th><th>Rule Name</th><th>Table</th><th>Type</th><th>Severity</th>
+              <th>Threshold</th><th>Active From</th><th>Active To</th><th>Status</th>
+              <th>Last Run</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="rules-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="sel-bar" id="sel-bar">
+    <div class="sel-bar-text"><span id="sel-count">0</span> rules selected</div>
+    <button class="btn btn-success btn-sm" onclick="bulkAction('approve')">✓ Approve All</button>
+    <button class="btn btn-danger btn-sm" onclick="bulkAction('reject')">✗ Reject All</button>
+    <button class="btn btn-ghost btn-sm" onclick="bulkAction('deactivate')">⏸ Deactivate</button>
+    <button class="btn btn-ghost btn-sm" onclick="clearSelection()">✕</button>
+  </div>
+</div>
+
+<!-- ─── EXECUTE ───────────────────────────────────────────────────────── -->
+<div id="page-execute" class="page">
+  <div class="ph">
+    <div class="ph-left"><div class="eyebrow">Live</div><div class="ph-title">Execute <em>&amp; Results</em></div></div>
+    <div class="ph-actions">
+      <button class="btn btn-secondary btn-sm" onclick="loadLatestResults()">↺ Load Last Run</button>
+      <button class="btn btn-primary" id="btn-exec" onclick="doExecute()">▷ Run All Active Rules</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="card" id="exec-log-card" style="display:none">
+      <div class="card-head"><div class="card-title">⚡ Execution Log</div></div>
+      <div class="card-body"><div class="log" id="exec-log"></div></div>
+    </div>
+
+    <div id="exec-stats" style="display:none" class="stat-grid" style="grid-template-columns:repeat(3,1fr)">
+      <div class="stat-card green"><div class="stat-label">Passed</div><div class="stat-val green" id="e-pass">0</div></div>
+      <div class="stat-card rose"><div class="stat-label">Failed</div><div class="stat-val rose" id="e-fail">0</div></div>
+      <div class="stat-card blue"><div class="stat-label">Total Run</div><div class="stat-val blue" id="e-total">0</div></div>
+    </div>
+
+    <!-- Impact Analysis Panel -->
+    <div id="impact-panel" style="display:none" class="impact-panel">
+      <div class="impact-header">
+        <div class="impact-score" id="impact-score-el">?</div>
+        <div>
+          <div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:4px">AI IMPACT ANALYSIS</div>
+          <div style="font-size:13px;font-weight:600" id="impact-assessment"></div>
+        </div>
+      </div>
+      <div class="impact-grid">
+        <div class="impact-section"><h4>⚠️ Risks</h4><div id="impact-risks"></div></div>
+        <div class="impact-section"><h4>✅ Recommendations</h4><div id="impact-recs"></div></div>
+        <div class="impact-section"><h4>🏛️ Regulatory Flags</h4><div id="impact-regs"></div></div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px" id="results-header" style="display:none">
+      <div style="font-size:13px;font-weight:700">Execution Results</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost btn-xs" onclick="filterResults('all')" id="rf-all">All</button>
+        <button class="btn btn-ghost btn-xs" onclick="filterResults('FAIL')" id="rf-fail">❌ Failed</button>
+        <button class="btn btn-ghost btn-xs" onclick="filterResults('PASS')" id="rf-pass">✅ Passed</button>
+      </div>
+    </div>
+    <div class="rg2" id="results-grid"></div>
+  </div>
+</div>
+
+<!-- ─── RUNS ──────────────────────────────────────────────────────────── -->
+<div id="page-runs" class="page">
+  <div class="ph">
+    <div class="ph-left"><div class="eyebrow">History</div><div class="ph-title">Run <em>History</em></div></div>
+    <button class="btn btn-ghost btn-sm ph-actions" onclick="loadRuns()">↺ Refresh</button>
+  </div>
+  <div class="content">
+    <div class="card">
+      <div class="card-body" style="padding:0">
+        <div class="tw">
+          <table>
+            <thead><tr><th>Run ID</th><th>Started</th><th>Duration</th><th>Total</th><th>Pass</th><th>Fail</th><th>Errors</th><th>Pass Rate</th><th>Risk</th><th>Detail</th></tr></thead>
+            <tbody id="runs-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── FEEDBACK ──────────────────────────────────────────────────────── -->
+<div id="page-feedback" class="page">
+  <div class="ph">
+    <div class="ph-left"><div class="eyebrow">AI Learning</div><div class="ph-title">Feedback <em>Log</em></div></div>
+    <button class="btn btn-ghost btn-sm ph-actions" onclick="loadFeedbackLog()">↺ Refresh</button>
+  </div>
+  <div class="content">
+    <div style="background:var(--teal-dim);border:1px solid rgba(0,229,180,.2);border-radius:10px;padding:14px 18px;margin-bottom:18px;font-size:12.5px">
+      🧠 Feedback is automatically loaded into the LangGraph context on the next <strong>Generate</strong> run. Gemini uses it to adjust thresholds and improve rule quality.
+    </div>
+    <div class="card">
+      <div class="card-body" style="padding:0">
+        <div class="tw">
+          <table>
+            <thead><tr><th>Rule</th><th>Table</th><th>Feedback Type</th><th>Comment</th><th>Suggested Threshold</th><th>Created</th></tr></thead>
+            <tbody id="feedback-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+</div><!-- /shell -->
+
+<!-- ══════════ MODALS ══════════ -->
+
+<!-- Reject -->
+<div class="overlay" id="ov-reject">
+  <div class="modal">
+    <h3>❌ Reject Rule</h3>
+    <input type="hidden" id="rej-id">
+    <div class="fg"><label class="fl">Rejection Reason</label><textarea class="fc" id="rej-reason" placeholder="Why is this rule being rejected?"></textarea></div>
+    <div class="mf"><button class="btn btn-ghost" onclick="closeModal('ov-reject')">Cancel</button><button class="btn btn-danger" onclick="confirmReject()">Reject</button></div>
+  </div>
+</div>
+
+<!-- Edit Rule -->
+<div class="overlay" id="ov-edit">
+  <div class="modal">
+    <h3>✏️ Edit Rule</h3>
+    <input type="hidden" id="edit-id">
+    <div class="fg"><label class="fl">Rule Name</label><input class="fc" id="edit-name" type="text"></div>
+    <div class="fg"><label class="fl">Description</label><textarea class="fc" id="edit-desc"></textarea></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="fg"><label class="fl">Threshold %</label><input class="fc" id="edit-threshold" type="number" min="0" max="100" step="0.5"></div>
+      <div class="fg"><label class="fl">Severity</label>
+        <select class="fc" id="edit-severity"><option>LOW</option><option>MEDIUM</option><option>HIGH</option><option>CRITICAL</option></select>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="fg"><label class="fl">Active From</label><input class="fc" id="edit-from" type="date"></div>
+      <div class="fg"><label class="fl">Active To (blank = never)</label><input class="fc" id="edit-to" type="date"></div>
+    </div>
+    <div class="mf"><button class="btn btn-ghost" onclick="closeModal('ov-edit')">Cancel</button><button class="btn btn-primary" onclick="saveEdit()">Save Changes</button></div>
+  </div>
+</div>
+
+<!-- Feedback -->
+<div class="overlay" id="ov-feedback">
+  <div class="modal">
+    <h3>💬 Execution Feedback</h3>
+    <input type="hidden" id="fb-exec-id"><input type="hidden" id="fb-rule-id">
+    <div style="margin-bottom:14px">
+      <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">RULE</div>
+      <div style="font-size:14px;font-weight:700;color:var(--teal)" id="fb-rule-name"></div>
+    </div>
+    <div class="fg"><label class="fl">Feedback Type</label>
+      <select class="fc" id="fb-type">
+        <option value="CORRECT">✅ Correct — Result is accurate</option>
+        <option value="FALSE_POSITIVE">⚠️ False Positive — Flagged incorrectly</option>
+        <option value="FALSE_NEGATIVE">❌ False Negative — Should have failed more</option>
+        <option value="RULE_TOO_STRICT">🔧 Rule Too Strict — Threshold too high</option>
+        <option value="RULE_TOO_LAX">🔧 Rule Too Lax — Threshold too low</option>
+        <option value="OTHER">💬 Other</option>
+      </select>
+    </div>
+    <div class="fg"><label class="fl">Comment (AI uses this in next generation run)</label>
+      <textarea class="fc" id="fb-comment" placeholder="What's wrong? What should change?"></textarea>
+    </div>
+    <div class="fg"><label class="fl">Suggested Threshold % (optional)</label>
+      <input class="fc" id="fb-threshold" type="number" min="0" max="100" step="0.5" placeholder="e.g. 90.0">
+    </div>
+    <div class="mf"><button class="btn btn-ghost" onclick="closeModal('ov-feedback')">Cancel</button><button class="btn btn-primary" onclick="submitFeedback()">Submit Feedback</button></div>
+  </div>
+</div>
+
+<!-- Run Detail -->
+<div class="overlay" id="ov-run">
+  <div class="modal" style="width:720px">
+    <h3 id="run-detail-title">Run Detail</h3>
+    <div id="run-detail-body"></div>
+    <div class="mf"><button class="btn btn-ghost" onclick="closeModal('ov-run')">Close</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════════
+let allResults   = [];
+let selectedRules = new Set();
+
+// ════════════════════════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════════════════════════
+function nav(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.getElementById('ni-' + page)?.classList.add('active');
+  if (page === 'dashboard')  refreshDashboard();
+  if (page === 'rules')      loadRules();
+  if (page === 'runs')       loadRuns();
+  if (page === 'feedback')   loadFeedbackLog();
+}
+
+// ════════════════════════════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════════════════════════════
+function toast(msg, type='success') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show ' + type;
+  setTimeout(() => el.classList.remove('show'), 3500);
+}
+
+// ════════════════════════════════════════════════════════════════
+// MODALS
+// ════════════════════════════════════════════════════════════════
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.overlay').forEach(o => o.addEventListener('click', e => {
+  if (e.target === o) o.classList.remove('open');
+}));
+
+// ════════════════════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════════════════════
+const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const fmt = d => d ? d.slice(0,16).replace('T',' ') : '—';
+
+function badgeStatus(s) {
+  const cls = (s||'').toLowerCase().replace(/_/g,'-').replace(' ','-');
+  const map = {'pending-approval':'pending_approval','pending':'pending'};
+  return `<span class="badge b-${map[cls]||cls}">${s||'—'}</span>`;
+}
+function badgeType(t)  { return t ? `<span class="badge b-${t.toLowerCase()}">${t}</span>` : ''; }
+function badgeSev(s)   { return s ? `<span class="badge b-${s.toLowerCase()}">${s}</span>` : ''; }
+function passColor(r)  { return r>=95?'var(--green)':r>=75?'var(--amber)':'var(--red)'; }
+
+// ════════════════════════════════════════════════════════════════
+// DASHBOARD
+// ════════════════════════════════════════════════════════════════
+async function refreshDashboard() {
+  const stats = await fetch('/api/stats').then(r => r.json());
+
+  document.getElementById('s-pass').textContent  = stats.recent_pass_rate + '%';
+  document.getElementById('s-active').textContent = stats.rules_by_status['ACTIVE'] || 0;
+  document.getElementById('s-pending').textContent = stats.rules_by_status['PENDING_APPROVAL'] || 0;
+  document.getElementById('s-execs').textContent  = stats.total_executions;
+
+  // Update pending badge in nav
+  const pc = stats.rules_by_status['PENDING_APPROVAL'] || 0;
+  const pcEl = document.getElementById('pending-count');
+  if (pc > 0) { pcEl.textContent = pc; pcEl.style.display = ''; }
+  else pcEl.style.display = 'none';
+
+  if (stats.last_run) {
+    const lr = stats.last_run;
+    const total = (lr.passed||0) + (lr.failed||0);
+    document.getElementById('s-pass-sub').textContent =
+      total ? `${lr.passed||0}/${total} rules passed` : 'No runs yet';
+  }
+
+  drawTypeDonut(stats.rules_by_type);
+  drawTrend(stats.trend || []);
+  drawTableChart(stats.rules_by_table || {});
+  drawWorstRules(stats.worst_rules || []);
+}
+
+function drawTypeDonut(data) {
+  const entries = Object.entries(data).filter(([k]) => k);
+  const total   = entries.reduce((s,[,v]) => s+v, 0);
+  if (!total) return;
+  const colors  = ['#00e5b4','#3b82f6','#a855f7','#f97316','#f43f5e','#f59e0b'];
+  const el      = document.getElementById('type-donut');
+  let angle     = -Math.PI/2;
+  let paths     = '';
+  entries.forEach(([k,v],i) => {
+    const slice = (v/total)*Math.PI*2;
+    const x1 = 60+50*Math.cos(angle), y1=60+50*Math.sin(angle);
+    angle += slice;
+    const x2=60+50*Math.cos(angle), y2=60+50*Math.sin(angle);
+    const large = slice>Math.PI?1:0;
+    paths += `<path d="M60,60 L${x1},${y1} A50,50 0 ${large},1 ${x2},${y2} Z" fill="${colors[i%colors.length]}" opacity=".9"/>`;
+  });
+  const legend = entries.map(([k,v],i) =>
+    `<div style="display:flex;align-items:center;gap:7px;margin-bottom:5px">
+      <div style="width:8px;height:8px;border-radius:50%;background:${colors[i%colors.length]};flex-shrink:0"></div>
+      <span style="font-size:11px;color:var(--text2)">${k}</span>
+      <span style="margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--text3)">${v}</span>
+    </div>`
+  ).join('');
+  el.innerHTML = `<div style="display:flex;gap:16px;align-items:center">
+    <svg width="120" height="120" viewBox="0 0 120 120">
+      ${paths}
+      <circle cx="60" cy="60" r="28" fill="var(--s1)"/>
+      <text x="60" y="65" text-anchor="middle" fill="var(--text2)" font-size="12" font-family="var(--mono)">${total}</text>
+    </svg>
+    <div style="flex:1">${legend}</div>
+  </div>`;
+}
+
+function drawTrend(trend) {
+  if (!trend.length) return;
+  const rev  = [...trend].reverse();
+  const vals = rev.map(r => parseFloat(r.avg_pass)||0);
+  const max  = Math.max(...vals, 100);
+  const w=400, h=80, pad=10;
+  const pts  = vals.map((v,i) => {
+    const x = pad + (i/(vals.length-1||1))*(w-pad*2);
+    const y = h - pad - ((v/max)*(h-pad*2));
+    return `${x},${y}`;
+  }).join(' ');
+  const svg = document.getElementById('trend-svg');
+  svg.innerHTML = `
+    <defs><linearGradient id="tg" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="var(--teal)" stop-opacity=".3"/>
+      <stop offset="100%" stop-color="var(--teal)" stop-opacity="0"/>
+    </linearGradient></defs>
+    <line x1="${pad}" y1="${h-pad}" x2="${w-pad}" y2="${h-pad}" stroke="var(--border)" stroke-width="1"/>
+    <line x1="${pad}" y1="${pad}" x2="${pad}" y2="${h-pad}" stroke="var(--border)" stroke-width="1"/>
+    <polyline points="${pts}" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linejoin="round"/>
+    ${vals.map((v,i)=>{
+      const x=pad+(i/(vals.length-1||1))*(w-pad*2),y=h-pad-((v/max)*(h-pad*2));
+      const c=v>=95?'var(--green)':v>=75?'var(--amber)':'var(--red)';
+      return `<circle cx="${x}" cy="${y}" r="3" fill="${c}"/>`;
+    }).join('')}`;
+  document.getElementById('trend-labels').innerHTML = rev.slice(0,5).reverse()
+    .map(r=>`<span>${(r.started_at||'').slice(5,10)}</span>`).join('');
+}
+
+function drawTableChart(data) {
+  const entries = Object.entries(data).sort(([,a],[,b])=>b-a);
+  const max = Math.max(...entries.map(([,v])=>v), 1);
+  document.getElementById('table-chart').innerHTML = entries.map(([k,v]) =>
+    `<div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
+        <span style="font-family:var(--mono)">${k}</span>
+        <span style="color:var(--text3)">${v}</span>
+      </div>
+      <div style="background:var(--border);border-radius:3px;height:5px">
+        <div style="width:${(v/max*100).toFixed(1)}%;background:var(--blue);height:100%;border-radius:3px"></div>
+      </div>
+    </div>`
+  ).join('');
+}
+
+function drawWorstRules(rules) {
+  const el = document.getElementById('worst-rules');
+  if (!rules.length) { el.innerHTML = '<div style="color:var(--text3);font-size:12px">Run rules to see data</div>'; return; }
+  el.innerHTML = rules.map(r => {
+    const pr = parseFloat(r.avg_pass)||0;
+    const c  = passColor(pr);
+    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:600">${esc(r.rule_name)}</div>
+        <div style="font-size:10px;color:var(--text3)">${r.target_table} · ${r.run_count} runs</div>
+      </div>
+      <div style="font-family:var(--mono);font-size:14px;font-weight:700;color:${c}">${pr.toFixed(1)}%</div>
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════════════════
+// GENERATE
+// ════════════════════════════════════════════════════════════════
+document.querySelectorAll('input[name=stype]').forEach(r => r.addEventListener('change', () => {
+  document.getElementById('fg-text').style.display   = r.value==='text'   ? '' : 'none';
+  document.getElementById('fg-folder').style.display = r.value==='folder' ? '' : 'none';
+}));
+
+const PIPELINE_STEPS = ['load_feedback','extract','generate','validate_sql','deduplicate','sync'];
+
+async function doGenerate() {
+  const btn = document.getElementById('btn-gen');
+  btn.disabled = true; btn.textContent = '⟳ Running Pipeline...';
+  document.getElementById('gen-card').style.display = '';
+  document.getElementById('gen-result').style.display = 'none';
+
+  // Animate pipeline steps
+  const stepEl = document.getElementById('gen-pipeline-steps');
+  let stepIdx = 0;
+  const stepTimer = setInterval(() => {
+    if (stepIdx < PIPELINE_STEPS.length) {
+      stepEl.innerHTML = PIPELINE_STEPS.map((s,i) =>
+        `<span style="color:${i<stepIdx?'var(--green)':i===stepIdx?'var(--amber)':'var(--text3)'}">${i<stepIdx?'✓':i===stepIdx?'▶':s.replace('_',' ')}</span>`
+      ).join('<span style="color:var(--border)"> → </span>');
+      stepIdx++;
+    }
+  }, 800);
+
+  const logEl = document.getElementById('gen-log');
+  logEl.innerHTML = '<div class="log-warn">⟳ Initialising LangGraph nodes...</div>';
+
+  const stype = document.querySelector('input[name=stype]:checked').value;
+  const body  = { source_type: stype };
+  if (stype==='text') body.source_text = document.getElementById('src-text').value;
+  else body.source_folder = document.getElementById('src-folder').value;
+
+  try {
+    const res  = await fetch('/api/generate', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const data = await res.json();
+    clearInterval(stepTimer);
+
+    logEl.innerHTML = (data.messages||[]).map(m => {
+      const cls = m.startsWith('❌')?'log-err':m.startsWith('⚠️')?'log-warn':m.startsWith('⏭️')?'log-info':'log-ok';
+      return `<div class="${cls}">${esc(m)}</div>`;
+    }).join('');
+
+    const resEl = document.getElementById('gen-result');
+    resEl.style.display = '';
+    resEl.innerHTML = `
+      <strong style="color:var(--teal)">✅ Pipeline Complete</strong>
+      — Generated: <strong>${data.generated||0}</strong>
+      · Validated: <strong>${data.validated||0}</strong>
+      · Deduped: <strong>${data.deduped||0}</strong>
+      · Saved (new): <strong>${data.new_rules_count||0}</strong>
+      <br><span style="font-size:11px;color:var(--text3)">→ Go to <strong>Manage Rules</strong> to approve</span>
+    `;
+
+    stepEl.innerHTML = PIPELINE_STEPS.map(s =>
+      `<span style="color:var(--green)">✓ ${s.replace('_',' ')}</span>`
+    ).join('<span style="color:var(--border)"> → </span>');
+
+    toast('Rules generated! Review in Manage Rules.', 'success');
+    refreshDashboard();
+  } catch(e) {
+    clearInterval(stepTimer);
+    logEl.innerHTML += `<div class="log-err">❌ ${esc(e.message)}</div>`;
+    toast('Generation failed: ' + e.message, 'err');
+  }
+  btn.disabled = false; btn.textContent = '🤖 Run LangGraph Pipeline';
+}
+
+// ════════════════════════════════════════════════════════════════
+// RULES TABLE
+// ════════════════════════════════════════════════════════════════
+async function loadRules() {
+  const status = document.getElementById('rules-filter').value;
+  const url    = status ? `/api/rules?status=${status}` : '/api/rules';
+  const rules  = await fetch(url).then(r => r.json());
+  const tbody  = document.getElementById('rules-body');
+  tbody.innerHTML = rules.map(r => buildRuleRow(r)).join('');
+  updateSelBar();
+}
+
+function buildRuleRow(r) {
+  const actions = [];
+  if (r.status === 'PENDING_APPROVAL') {
+    actions.push(`<button class="btn btn-success btn-xs" onclick="approveRule('${r.rule_id}')">✓ Approve</button>`);
+    actions.push(`<button class="btn btn-danger btn-xs" onclick="openReject('${r.rule_id}')">✗ Reject</button>`);
+  }
+  if (r.status === 'ACTIVE') {
+    actions.push(`<button class="btn btn-ghost btn-xs" onclick="openEdit('${r.rule_id}')">✏️</button>`);
+    actions.push(`<button class="btn btn-ghost btn-xs" onclick="deactivateRule('${r.rule_id}')">⏸</button>`);
+  }
+  if (r.status === 'DEACTIVATED') {
+    actions.push(`<button class="btn btn-success btn-xs" onclick="reactivateRule('${r.rule_id}')">▶ Reactivate</button>`);
+  }
+
+  const lastRunHtml = r.last_run ? (
+    `<div style="font-size:10px;color:var(--text3)">${fmt(r.last_run)}</div>
+     <div style="font-family:var(--mono);font-size:10px">P:${r.exec_pass||0} F:${r.exec_fail||0}</div>`
+  ) : '<span style="color:var(--text3);font-size:10px">Never</span>';
+
+  return `<tr>
+    <td><input type="checkbox" class="rule-chk" value="${r.rule_id}" onchange="onCheckChange()"></td>
+    <td><span style="font-family:var(--mono);font-size:10px;color:var(--text3)">${r.rule_id}</span></td>
+    <td>
+      <div style="font-weight:600;font-size:12.5px">${esc(r.rule_name)}</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:1px">${esc(r.description||'').slice(0,60)}</div>
+    </td>
+    <td><span style="font-family:var(--mono);font-size:11px">${r.target_table}</span></td>
+    <td>${badgeType(r.rule_type)}</td>
+    <td>${badgeSev(r.severity)}</td>
+    <td><span style="font-family:var(--mono);font-size:11px">${r.threshold_pct}%</span></td>
+    <td style="font-size:11px">${r.active_from||'—'}</td>
+    <td style="font-size:11px;color:${r.active_to?'var(--amber)':'var(--text3)'}">${r.active_to||'∞'}</td>
+    <td>${badgeStatus(r.status)}</td>
+    <td>${lastRunHtml}</td>
+    <td><div class="cb">${actions.join('')}</div></td>
+  </tr>`;
+}
+
+function toggleAll(el) {
+  document.querySelectorAll('.rule-chk').forEach(c => { c.checked = el.checked; });
+  onCheckChange();
+}
+function onCheckChange() {
+  selectedRules = new Set([...document.querySelectorAll('.rule-chk:checked')].map(c => c.value));
+  updateSelBar();
+}
+function updateSelBar() {
+  const bar = document.getElementById('sel-bar');
+  document.getElementById('sel-count').textContent = selectedRules.size;
+  bar.classList.toggle('show', selectedRules.size > 0);
+}
+function clearSelection() {
+  document.querySelectorAll('.rule-chk').forEach(c => c.checked = false);
+  document.getElementById('chk-all').checked = false;
+  selectedRules.clear(); updateSelBar();
+}
+
+async function bulkAction(action) {
+  if (!selectedRules.size) return;
+  await fetch('/api/rules/bulk', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({action, rule_ids: [...selectedRules]}),
+  });
+  toast(`Bulk ${action} applied to ${selectedRules.size} rules`, 'success');
+  clearSelection(); loadRules(); refreshDashboard();
+}
+
+async function approveRule(id) {
+  await fetch(`/api/rules/${id}/approve`,{method:'POST'});
+  toast('Rule approved ✅'); loadRules(); refreshDashboard();
+}
+function openReject(id) {
+  document.getElementById('rej-id').value = id;
+  document.getElementById('rej-reason').value = '';
+  document.getElementById('ov-reject').classList.add('open');
+}
+async function confirmReject() {
+  const id  = document.getElementById('rej-id').value;
+  const rsn = document.getElementById('rej-reason').value;
+  await fetch(`/api/rules/${id}/reject`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reason:rsn})});
+  closeModal('ov-reject'); toast('Rule rejected','err'); loadRules(); refreshDashboard();
+}
+async function deactivateRule(id) {
+  await fetch(`/api/rules/${id}/deactivate`,{method:'POST'});
+  toast('Rule deactivated — active_to set to today','warn'); loadRules(); refreshDashboard();
+}
+async function reactivateRule(id) {
+  await fetch(`/api/rules/${id}/reactivate`,{method:'POST'});
+  toast('Rule reactivated ✅'); loadRules(); refreshDashboard();
+}
+
+async function openEdit(id) {
+  const data = await fetch(`/api/rules/${id}`).then(r => r.json());
+  const rule = data.rule;
+  document.getElementById('edit-id').value        = id;
+  document.getElementById('edit-name').value      = rule.rule_name || '';
+  document.getElementById('edit-desc').value      = rule.description || '';
+  document.getElementById('edit-threshold').value = rule.threshold_pct || 95;
+  document.getElementById('edit-severity').value  = rule.severity || 'MEDIUM';
+  document.getElementById('edit-from').value      = rule.active_from || '';
+  document.getElementById('edit-to').value        = rule.active_to || '';
+  document.getElementById('ov-edit').classList.add('open');
+}
+async function saveEdit() {
+  const id = document.getElementById('edit-id').value;
+  const payload = {
+    rule_name:       document.getElementById('edit-name').value,
+    description:     document.getElementById('edit-desc').value,
+    threshold_pct:   parseFloat(document.getElementById('edit-threshold').value),
+    severity:        document.getElementById('edit-severity').value,
+    active_from:     document.getElementById('edit-from').value,
+    active_to:       document.getElementById('edit-to').value || null,
+  };
+  await fetch(`/api/rules/${id}/update`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  closeModal('ov-edit'); toast('Rule updated ✅'); loadRules();
+}
+
+// ════════════════════════════════════════════════════════════════
+// EXECUTE
+// ════════════════════════════════════════════════════════════════
+async function doExecute() {
+  const btn = document.getElementById('btn-exec');
+  btn.disabled = true; btn.textContent = '⟳ Executing...';
+  document.getElementById('exec-log-card').style.display = '';
+  document.getElementById('exec-stats').style.display = 'grid';
+  document.getElementById('impact-panel').style.display = 'none';
+  document.getElementById('results-header').style.display = 'flex';
+  document.getElementById('results-grid').innerHTML = '<div style="color:var(--text3);font-size:12px">⟳ Executing rules...</div>';
+  document.getElementById('exec-log').innerHTML = '<div class="log-warn">⟳ LangGraph execution pipeline starting...</div>';
+
+  try {
+    const res  = await fetch('/api/execute',{method:'POST'});
+    const data = await res.json();
+
+    document.getElementById('exec-log').innerHTML = (data.messages||[]).map(m => {
+      const cls = m.startsWith('❌')||m.startsWith('💥')?'log-err':m.startsWith('⚠️')?'log-warn':'log-ok';
+      return `<div class="${cls}">${esc(m)}</div>`;
+    }).join('');
+
+    allResults = data.results || [];
+    renderResults(allResults);
+    renderImpact(data.impact_summary || {});
+    refreshDashboard();
+    toast('Execution complete!', 'success');
+  } catch(e) {
+    document.getElementById('exec-log').innerHTML += `<div class="log-err">❌ ${esc(e.message)}</div>`;
+    toast('Execution error: '+e.message, 'err');
+  }
+  btn.disabled = false; btn.textContent = '▷ Run All Active Rules';
+}
+
+async function loadLatestResults() {
+  const runs = await fetch('/api/runs').then(r => r.json());
+  if (!runs.length) { toast('No runs found','warn'); return; }
+  const latestRun = runs[0].run_id;
+  const execs = await fetch(`/api/executions?run_id=${latestRun}`).then(r => r.json());
+  allResults = execs;
+  document.getElementById('exec-stats').style.display = 'grid';
+  document.getElementById('results-header').style.display = 'flex';
+  renderResults(allResults);
+  if (runs[0].ai_adjustments) renderImpact(runs[0].ai_adjustments);
+}
+
+function filterResults(f) {
+  document.querySelectorAll('[id^=rf-]').forEach(b => b.classList.replace('btn-primary','btn-ghost'));
+  document.getElementById('rf-'+f.toLowerCase()).classList.replace('btn-ghost','btn-primary');
+  if (f==='all') renderResults(allResults);
+  else renderResults(allResults.filter(r => r.status===f));
+}
+
+function renderResults(results) {
+  const passed = results.filter(r=>r.status==='PASS').length;
+  const failed = results.filter(r=>r.status==='FAIL').length;
+  document.getElementById('e-pass').textContent  = passed;
+  document.getElementById('e-fail').textContent  = failed;
+  document.getElementById('e-total').textContent = results.length;
+
+  const grid = document.getElementById('results-grid');
+  if (!results.length) {
+    grid.innerHTML = '<div style="color:var(--text3);grid-column:1/-1">No active rules to execute. Approve some rules first.</div>';
+    return;
+  }
+  grid.innerHTML = results.map(r => {
+    const pct  = r.pass_rate ?? 0;
+    const thr  = r.threshold_pct ?? 95;
+    const fc   = pct >= thr ? 'var(--green)' : pct >= 70 ? 'var(--amber)' : 'var(--red)';
+    const nvc  = r.status==='PASS'?'var(--green)':'var(--red)';
+    return `<div class="rc ${(r.status||'error').toLowerCase()}">
+      <div class="rc-head">
+        <div class="rc-name">${esc(r.rule_name||r.rule_id)}</div>
+        ${badgeStatus(r.status||'ERROR')}
+      </div>
+      <div class="rc-meta">
+        ${badgeType(r.rule_type)} ${badgeSev(r.severity)}
+        <span style="font-family:var(--mono);font-size:9.5px;color:var(--text3)">${r.target_table||''}</span>
+      </div>
+      ${r.status !== 'ERROR' ? `
+      <div class="prog">
+        <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${fc}"></div></div>
+        <div class="prog-val" style="color:${fc}">${pct}%</div>
+      </div>
+      <div class="rc-nums">
+        <div><div class="rc-num-val" style="color:${nvc}">${r.failed_records??'—'}</div><div class="rc-num-lbl">Failed</div></div>
+        <div><div class="rc-num-val" style="color:var(--text2)">${r.total_records??'—'}</div><div class="rc-num-lbl">Total</div></div>
+        <div><div class="rc-num-val" style="color:var(--text3)">${thr}%</div><div class="rc-num-lbl">Threshold</div></div>
+      </div>
+      ${r.detail ? `<div class="detail-txt">${esc(r.detail)}</div>` : ''}
+      ` : `<div style="color:var(--red);font-family:var(--mono);font-size:11px;margin-top:7px">❌ ${esc(r.error_message||'')}</div>`}
+      <details class="sql-reveal"><summary>SQL ▾</summary><div class="sql-box">${esc(r.sql_used||'')}</div></details>
+      <button class="btn btn-ghost btn-xs" style="margin-top:10px;width:100%" onclick="openFeedback('${r.execution_id}','${r.rule_id}','${esc(r.rule_name||'')}')">💬 Give Feedback</button>
+    </div>`;
+  }).join('');
+}
+
+function renderImpact(impact) {
+  if (!impact || !impact.assessment) return;
+  const panel = document.getElementById('impact-panel');
+  panel.style.display = '';
+  const risk  = impact.overall_risk || 'UNKNOWN';
+  document.getElementById('impact-score-el').textContent = risk;
+  document.getElementById('impact-score-el').className = `impact-score ${risk}`;
+  document.getElementById('impact-assessment').textContent = impact.assessment || '';
+
+  document.getElementById('impact-risks').innerHTML = (impact.risks||[]).map(r =>
+    `<div class="impact-item"><div style="font-weight:600">${esc(r.area||'')}</div><div style="color:var(--text2);font-size:11px;margin-top:3px">${esc(r.description||'')}</div></div>`
+  ).join('') || '<div style="color:var(--text3);font-size:12px">No risks identified</div>';
+
+  document.getElementById('impact-recs').innerHTML = (impact.recommendations||[]).map(r =>
+    `<div class="impact-item"><div class="prio prio-${r.priority}">${r.priority}</div>${esc(r.action||'')}</div>`
+  ).join('') || '<div style="color:var(--text3);font-size:12px">No recommendations</div>';
+
+  document.getElementById('impact-regs').innerHTML = (impact.regulatory_flags||[]).map(f =>
+    `<div class="impact-item" style="color:var(--amber)">${esc(f)}</div>`
+  ).join('') || '<div style="color:var(--text3);font-size:12px">No flags</div>';
+}
+
+// ════════════════════════════════════════════════════════════════
+// FEEDBACK MODAL
+// ════════════════════════════════════════════════════════════════
+function openFeedback(execId, ruleId, ruleName) {
+  document.getElementById('fb-exec-id').value  = execId;
+  document.getElementById('fb-rule-id').value  = ruleId;
+  document.getElementById('fb-rule-name').textContent = ruleName;
+  document.getElementById('fb-comment').value  = '';
+  document.getElementById('fb-threshold').value = '';
+  document.getElementById('ov-feedback').classList.add('open');
+}
+async function submitFeedback() {
+  const payload = {
+    execution_id: document.getElementById('fb-exec-id').value,
+    rule_id:      document.getElementById('fb-rule-id').value,
+    feedback_type:document.getElementById('fb-type').value,
+    comment:      document.getElementById('fb-comment').value,
+    suggested_threshold: parseFloat(document.getElementById('fb-threshold').value)||null,
+  };
+  await fetch('/api/feedback',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  closeModal('ov-feedback');
+  toast('✅ Feedback saved — AI will use this in next generation run','success');
+}
+
+// ════════════════════════════════════════════════════════════════
+// RUNS
+// ════════════════════════════════════════════════════════════════
+async function loadRuns() {
+  const runs = await fetch('/api/runs').then(r => r.json());
+  document.getElementById('runs-body').innerHTML = runs.map(run => {
+    const tot  = run.total_rules || 1;
+    const pct  = run.passed ? Math.round((run.passed/tot)*100) : 0;
+    const fc   = passColor(pct);
+    const dur  = run.completed_at && run.started_at
+      ? Math.round((new Date(run.completed_at)-new Date(run.started_at))/1000) + 's'
+      : '—';
+    const risk = run.ai_adjustments?.overall_risk || '—';
+    const riskCls = risk==='CRITICAL'?'b-critical':risk==='HIGH'?'b-high':risk==='MEDIUM'?'b-medium':risk==='LOW'?'b-low':'';
+    return `<tr>
+      <td><span style="font-family:var(--mono);font-size:10px">${run.run_id}</span></td>
+      <td style="font-size:11px">${fmt(run.started_at)}</td>
+      <td style="font-size:11px;color:var(--text3)">${dur}</td>
+      <td style="font-family:var(--mono)">${run.total_rules||0}</td>
+      <td style="font-family:var(--mono);color:var(--green)">${run.passed||0}</td>
+      <td style="font-family:var(--mono);color:var(--red)">${run.failed||0}</td>
+      <td style="font-family:var(--mono);color:var(--text3)">${run.errors||0}</td>
+      <td><div class="prog"><div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${fc}"></div></div><span style="font-family:var(--mono);font-size:10px;color:${fc}">${pct}%</span></div></td>
+      <td>${riskCls?`<span class="badge ${riskCls}">${risk}</span>`:'<span style="color:var(--text3)">—</span>'}</td>
+      <td><button class="btn btn-ghost btn-xs" onclick="showRunDetail('${run.run_id}')">Detail</button></td>
+    </tr>`;
+  }).join('');
+}
+
+async function showRunDetail(runId) {
+  const data = await fetch(`/api/runs/${runId}`).then(r => r.json());
+  document.getElementById('run-detail-title').textContent = `Run: ${runId}`;
+  const execs = data.executions || [];
+  document.getElementById('run-detail-body').innerHTML = `
+    <div style="margin-bottom:16px">${renderImpactMini(data.run?.ai_adjustments)}</div>
+    <table style="width:100%">
+      <thead><tr><th>Rule</th><th>Status</th><th>Pass Rate</th><th>Failed/Total</th></tr></thead>
+      <tbody>${execs.map(e=>`<tr>
+        <td style="font-size:12px;font-weight:600">${esc(e.rule_name||e.rule_id)}</td>
+        <td>${badgeStatus(e.status)}</td>
+        <td style="font-family:var(--mono);font-size:12px;color:${passColor(e.pass_rate||0)}">${e.pass_rate??'—'}%</td>
+        <td style="font-family:var(--mono);font-size:11px;color:var(--text3)">${e.failed_records??'?'}/${e.total_records??'?'}</td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+  document.getElementById('ov-run').classList.add('open');
+}
+
+function renderImpactMini(impact) {
+  if (!impact || typeof impact !== 'object') return '';
+  const risk = impact.overall_risk||'UNKNOWN';
+  return `<div style="background:var(--s3);border:1px solid var(--border);border-radius:8px;padding:12px 14px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="badge ${risk==='CRITICAL'?'b-critical':risk==='HIGH'?'b-high':risk==='MEDIUM'?'b-medium':'b-low-risk'}">${risk} RISK</span>
+      <span style="font-size:12px;color:var(--text2)">${esc(impact.assessment||'')}</span>
+    </div>
+  </div>`;
+}
+
+// ════════════════════════════════════════════════════════════════
+// FEEDBACK LOG
+// ════════════════════════════════════════════════════════════════
+async function loadFeedbackLog() {
+  const items = await fetch('/api/feedback').then(r => r.json());
+  const ftype_colors = {CORRECT:'var(--green)',FALSE_POSITIVE:'var(--amber)',FALSE_NEGATIVE:'var(--red)',RULE_TOO_STRICT:'var(--orange)',RULE_TOO_LAX:'var(--blue)',OTHER:'var(--text2)'};
+  document.getElementById('feedback-body').innerHTML = items.map(f =>
+    `<tr>
+      <td style="font-size:12px;font-weight:600">${esc(f.rule_name)}</td>
+      <td><span style="font-family:var(--mono);font-size:10px">${f.target_table}</span></td>
+      <td><span style="font-size:11px;font-weight:600;color:${ftype_colors[f.feedback_type]||'var(--text)'}">${f.feedback_type}</span></td>
+      <td style="font-size:11px;color:var(--text2);max-width:200px">${esc(f.comment||'—')}</td>
+      <td style="font-family:var(--mono);font-size:11px">${f.suggested_threshold!=null?f.suggested_threshold+'%':'—'}</td>
+      <td style="font-size:10px;color:var(--text3)">${fmt(f.created_at)}</td>
+    </tr>`
+  ).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:20px">No feedback yet — run rules and use the 💬 button</td></tr>';
+}
+
+// ════════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════════
+refreshDashboard();
+</script>
+</body>
+</html>
